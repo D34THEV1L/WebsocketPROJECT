@@ -1,17 +1,18 @@
-import asyncio, websockets
+import asyncio
+import websockets
 from structs import discord, handler
 
 connections = {}
 
 async def on_register(websocket, identifier):
-    if connections.get(identifier) == None:
-        print("Registered "+identifier)
-        connections[identifier] = [websocket,{}]
+    if connections.get(identifier) is None:
+        print("Registered " + identifier)
+        connections[identifier] = [websocket, {}]
         await discord.on_register(identifier)
 
 async def on_unregister(identifier, *err):
     if connections.get(identifier):
-        print("Unregistered "+identifier)
+        print("Unregistered " + identifier)
         await discord.on_unregister(identifier)
         await handler.on_unregister(identifier, connections[identifier])
         del connections[identifier]
@@ -26,12 +27,12 @@ async def connect(websocket, path):
             await handler.on_message_received(identifier, connections[identifier], message)
     except Exception as e:
         print(e)
-        await on_unregister(identifier, f"{e.args}") 
+        await on_unregister(identifier, f"{e.args}")
     finally:
         await on_unregister(identifier)
-    pass
 
 def init():
-    server = websockets.serve(connect, "localhost", 300)
-    asyncio.get_event_loop().run_until_complete(server)
+    server = websockets.serve(connect, "0.0.0.0", 3000)  # Permitir conexiones desde cualquier dirección
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(server)
     print("Websocket alive")
