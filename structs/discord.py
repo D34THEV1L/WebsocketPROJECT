@@ -2,7 +2,7 @@ import os, discord, time
 from discord.ext import commands
 from structs import handler
 
-client = commands.Bot(command_prefix=".")
+client = commands.Bot(command_prefix=">", intents=discord.Intents.all())
 channel = None
 
 async def on_register(identifier):
